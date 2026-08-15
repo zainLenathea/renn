@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Alya</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0d0d0d;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+      transition: background 1.5s ease;
+    }
+
+    /* Canvas Efek Hujan & Bintang */
+    #bgCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Layar Utama */
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Tampilan Barcode Awal */
+    .barcode-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      padding: 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 105, 180, 0.3);
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .barcode-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+    }
+    .barcode-lines {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 80px;
+      margin-bottom: 15px;
+    }
+    .line {
+      background-color: #ff69b4;
+      height: 100%;
+      border-radius: 2px;
+      box-shadow: 0 0 8px #ff69b4;
+    }
+    .heart-icon {
+      color: #ff69b4;
+      font-size: 30px;
+      margin: 0 10px;
+      text-shadow: 0 0 10px #ff69b4;
+    }
+    .title-text {
+      font-size: 2rem;
+      color: #ff69b4;
+      text-shadow: 0 0 10px #ff69b4;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #ffb6c1;
+      margin-top: 8px;
+    }
+
+    /* Buku 3D */
+    .book-container {
+      display: none;
+      perspective: 1200px;
+      margin-top: 20px;
+    }
+    .book {
+      width: 280px;
+      height: 380px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+    .page {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      cursor: pointer;
+      transform-origin: left center;
+      transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+      backface-visibility: hidden;
+      border: 2px solid #ff69b4;
+    }
+    .page img {
+      width: 100%;
+      height: 80%;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #ffb6c1;
+    }
+    .page-caption {
+      margin-top: 10px;
+      color: #ff1493;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    /* Akhir: Grid Love */
+    .love-mosaic {
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      max-width: 350px;
+      animation: fadeIn 2s forwards;
+    }
+    .love-mosaic img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #ff69b4;
+      box-shadow: 0 0 15px #ff69b4;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="container">
+    <!-- 1. Tampilan Barcode & To Alya -->
+    <div class="barcode-card" id="startBtn">
+      <div class="barcode-lines">
+        <div class="line" style="width: 4px;"></div>
+        <div class="line" style="width: 2px;"></div>
+        <div class="line" style="width: 6px;"></div>
+        <span class="heart-icon">♥</span>
+        <div class="line" style="width: 3px;"></div>
+        <div class="line" style="width: 5px;"></div>
+        <div class="line" style="width: 2px;"></div>
+      </div>
+      <div class="title-text">To Alya ♥</div>
+      <div class="subtitle">Klik untuk membuka pesan</div>
+    </div>
+
+    <!-- 2. Buku Foto -->
+    <div class="book-container" id="bookContainer">
+      <div class="book" id="book">
+        <!-- Gantilah URL gambar di bawah (src) dengan foto Alya -->
+        <div class="page" style="z-index: 6;">
+          <img src="foto alya1.jpeg" alt="Foto 1">
+          <div class="page-caption">Klik untuk membalik ♥ (1/6)</div>
+        </div>
+        <div class="page" style="z-index: 5;">
+          <img src="foto alya2.jpeg" alt="Foto 2">
+          <div class="page-caption">Momen Indah (2/6)</div>
+        </div>
+        <div class="page" style="z-index: 4;">
+          <img src="foto alya3.jpeg" alt="Foto 3">
+          <div class="page-caption">Senyummu (3/6)</div>
+        </div>
+        <div class="page" style="z-index: 3;">
+          <img src="foto alya4.jpeg" alt="Foto 4">
+          <div class="page-caption">Favoritku (4/6)</div>
+        </div>
+        <div class="page" style="z-index: 2;">
+          <img src="foto alya.jpeg" alt="Foto 5">
+          <div class="page-caption">Bersamamu (5/6)</div>
+        </div>
+        <div class="page" style="z-index: 1;">
+          <img src="foto alya6.jpeg" alt="Foto 6">
+          <div class="page-caption">Halaman Terakhir (6/6)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Formasi Foto Love -->
+    <div class="love-mosaic" id="loveMosaic">
+      <img src="foto alya1.jpeg" alt="1">
+      <img src="foto alya2.jpeg" alt="2">
+      <img src="foto alya3.jpeg" alt="3">
+      <img src="foto alya4.jpeg" alt="4">
+      <img src="foto alya.jpeg" alt="5">
+      <img src="foto alya6.jpeg" alt="6">
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    // Modus Background: 'rain' atau 'starry'
+    let bgMode = 'rain';
+
+    // Inisialisasi Hujan Pink
+    const drops = [];
+    for (let i = 0; i < 150; i++) {
+      drops.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        length: Math.random() * 20 + 10,
+        speed: Math.random() * 5 + 5,
+        opacity: Math.random() * 0.7 + 0.3
+      });
+    }
+
+    // Inisialisasi Bintang
+    const stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random(),
+        speed: Math.random() * 0.02 + 0.005
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      if (bgMode === 'rain') {
+        ctx.strokeStyle = '#ff69b4';
+        ctx.lineWidth = 1.5;
+        for (let drop of drops) {
+          ctx.globalAlpha = drop.opacity;
+          ctx.beginPath();
+          ctx.moveTo(drop.x, drop.y);
+          ctx.lineTo(drop.x, drop.y + drop.length);
+          ctx.stroke();
+
+          drop.y += drop.speed;
+          if (drop.y > height) {
+            drop.y = -drop.length;
+            drop.x = Math.random() * width;
+          }
+        }
+      } else if (bgMode === 'starry') {
+        for (let star of stars) {
+          ctx.fillStyle = '#ffffff';
+          ctx.globalAlpha = Math.abs(Math.sin(star.alpha));
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          star.alpha += star.speed;
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Logika Interaksi
+    const startBtn = document.getElementById('startBtn');
+    const bookContainer = document.getElementById('bookContainer');
+    const pages = document.querySelectorAll('.page');
+    const loveMosaic = document.getElementById('loveMosaic');
+    let currentPage = 0;
+
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      bookContainer.style.display = 'block';
+    });
+
+    pages.forEach((page, index) => {
+      page.addEventListener('click', () => {
+        page.style.transform = 'rotateY(-160deg)';
+        currentPage++;
+
+        if (currentPage === pages.length) {
+          setTimeout(() => {
+            bookContainer.style.display = 'none';
+            loveMosaic.style.display = 'grid';
+            
+            // Ubah Background ke Langit Berbintang Malam
+            bgMode = 'starry';
+            document.body.style.background = 'radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)';
+          }, 800);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
